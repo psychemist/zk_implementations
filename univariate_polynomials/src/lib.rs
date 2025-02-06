@@ -4,8 +4,8 @@ use std::ops::{Add, Mul};
 
 // ============= STRUCTS =============
 #[derive(Debug, PartialEq, Clone)]
-struct UnivariatePolyDense<F: PrimeField> {
-    coefficient: Vec<F>,
+pub struct UnivariatePolyDense<F: PrimeField> {
+    pub coefficient: Vec<F>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -16,7 +16,7 @@ struct UnivariatePolySparse<F: PrimeField> {
 // ============= DENSE IMPLEMENTATIONS =============
 
 impl<F: PrimeField> UnivariatePolyDense<F> {
-    fn new(coefficient: Vec<F>) -> Self {
+    pub fn new(coefficient: Vec<F>) -> Self {
         UnivariatePolyDense { coefficient }
     }
 
@@ -28,7 +28,7 @@ impl<F: PrimeField> UnivariatePolyDense<F> {
         }
     }
 
-    fn evaluate(&self, x: F) -> F {
+    pub fn evaluate(&self, x: F) -> F {
         self.coefficient
             .iter()
             .rev()
@@ -37,7 +37,7 @@ impl<F: PrimeField> UnivariatePolyDense<F> {
             .unwrap()
     }
 
-    fn scalar_mul(&self, scalar: &F) -> Self {
+    pub fn scalar_mul(&self, scalar: &F) -> Self {
         UnivariatePolyDense::new(
             self.coefficient
                 .iter()
@@ -46,7 +46,7 @@ impl<F: PrimeField> UnivariatePolyDense<F> {
         )
     }
 
-    fn basis(x: &F, interpolating_set: &[F]) -> Self {
+    pub fn basis(x: &F, interpolating_set: &[F]) -> Self {
         // numerator
         let numerator: UnivariatePolyDense<F> = interpolating_set
             .iter()
@@ -60,7 +60,7 @@ impl<F: PrimeField> UnivariatePolyDense<F> {
         numerator.scalar_mul(&denominator)
     }
 
-    fn interpolate(xs: Vec<F>, ys: Vec<F>) -> Self {
+    pub fn interpolate(xs: Vec<F>, ys: Vec<F>) -> Self {
         xs.iter()
             .zip(ys.iter())
             .map(|(x, y)| Self::basis(x, &xs).scalar_mul(y))
