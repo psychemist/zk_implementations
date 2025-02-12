@@ -116,20 +116,14 @@ mod tests {
 
         // Generate a secret
         let secret = create_secret::<F>();
-        println!("\nGenerated Secret: {}", secret);
 
         // Generate shares and polynomial coefficients
         let threshold = 3;
         let num_shares = 5;
         let shares = split_secret(secret, threshold, num_shares);
-        
-        for (i, share) in shares.iter().enumerate() {
-            println!("\nShare {}: ({}, {})", i + 1, share.x, share.y);
-        }
 
         // Reconstruct the secret
         let reconstructed_secret = reconstruct_secret(&shares[..threshold]);
-        println!("\nReconstructed Secret: {}", reconstructed_secret);
 
         // Validate that the reconstructed secret matches the original
         assert_eq!(secret, reconstructed_secret);

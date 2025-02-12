@@ -132,14 +132,14 @@ impl<F: PrimeField> UnivariatePolySparse<F> {
     }
 
     fn degree(&self) -> usize {
-        if self.coefficient.is_empty() {
-            return 0;
-        } else {
-            return self.coefficient[0].1;
-        }
+        self.coefficient.first().map(|(_, d)| *d).unwrap_or(0)
     }
 
     fn evaluate(&self, x: F) -> F {
+        if self.coefficient.is_empty() {
+            return F::zero();
+        }
+
         self.coefficient
             .iter()
             .fold(F::zero(), |acc, (coeff, power)| {
@@ -189,35 +189,16 @@ impl<F: PrimeField> Add for &UnivariatePolySparse<F> {
     type Output = UnivariatePolySparse<F>;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let (mut bigger, smaller) = if self.degree() < rhs.degree() {
-            (rhs.clone(), self)
-        } else {
-            (self.clone(), rhs)
-        };
-
-        let mut new_coefficients: Vec<(F, usize)> = bigger
-            .coefficient
-            .iter_mut()
-            .map(|(b_coeff, b_degree)| {
-            if let Some((s_coeff, _s_degree)) = 
-                smaller.coefficient.iter().find(|(_, s_degree)| s_degree == b_degree) {
-                *b_coeff += s_coeff;
+        let mut result = self.coefficient.clone();
+        for (coeff, degree) in &rhs.coefficient {
+            match result.iter_mut().find(|(_, d)| *d == *degree) {
+                Some((existing_coeff, _)) => *existing_coeff += coeff,
+                None => result.push((*coeff, *degree)),
             }
-            (*b_coeff, *b_degree)
-            })
-            .collect();
+        }
 
-        new_coefficients.extend(
-            smaller
-            .coefficient
-            .iter()
-            .filter(|(_, s_degree)| !bigger.coefficient.iter().any(|(_, b_degree)| b_degree == s_degree))
-            .cloned()
-        );
-
-        new_coefficients.sort_by(|a, b| b.1.cmp(&a.1));
-
-        UnivariatePolySparse::new(new_coefficients)
+        result.sort_by(|a, b| b.1.cmp(&a.1));
+        UnivariatePolySparse::new(result)
     }
 }
 
