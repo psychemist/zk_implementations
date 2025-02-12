@@ -18,7 +18,6 @@ fn create_secret<F: PrimeField>() -> F {
     // Use F::rand to generate a random field element
     let secret = F::rand(&mut rng);
 
-    dbg!(secret);
     secret
 }
 
@@ -40,28 +39,23 @@ fn generate_coefficients<F: PrimeField>(secret: F, threshold: usize) -> Univaria
     poly
 }
 
-// fn interpolate_at_zero(points: &[(F, F)]) -> F {
-//     todo!()
-// }
-
 // Generate shares by evaluating the polynomial at distinct points
-fn split_secret<F: PrimeField>(threshold: usize, num_shares: usize) -> Vec<Share<F>> {
+fn split_secret<F: PrimeField>(secret: F, threshold: usize, num_shares: usize) -> Vec<Share<F>> {
     assert!(
         threshold <= num_shares,
         "Threshold must be less than or equal to total shares"
     );
 
-    let secret: F = create_secret();
     let polynomial = generate_coefficients(secret, threshold);
     // let mut shares = vec![secret];
     let mut shares = Vec::new();
-    shares.push(Share{0, secret });
+    // shares.push(Share{ x: F::zero(), y: secret });
 
     // Create shares of x = degree and y = coefficient @ x
     for i in 1..=num_shares {
         let x = F::from(i as u64);
         let y = polynomial.evaluate(x);
-        shares.push(Share { x, y});
+        shares.push(Share { x, y });
     }
 
     shares
@@ -80,7 +74,6 @@ fn reconstruct_secret<F: PrimeField>(shares: &[Share<F>]) -> F {
     // Interpolate the points to get the polynomial
     let poly = UnivariatePolyDense::interpolate(xs, ys);
 
-    dbg!(poly.evaluate(F::from(password)));
     poly.evaluate(F::from(password))
 }
 
@@ -91,22 +84,22 @@ fn main() {
 
     // Generate a secret
     let secret: F = create_secret();
-    println!("Generated Secret: {}", secret);
+    println!("\nGenerated Secret: {}", secret);
 
     let threshold: usize = 3;
     let num_shares: usize = 5;
     
     // Generate shares
-    let shares: Vec<Share<F>> = split_secret(threshold, num_shares);
+    let shares: Vec<Share<F>> = split_secret(secret, threshold, num_shares);
 
     // Print shares
     for (i, share) in shares.iter().enumerate() {
-        println!("Share {}: ({}, {})", i + 1, share.x, share.y);
+        println!("\nShare {}: ({}, {})", i + 1, share.x, share.y);
     }
 
     // Reconstruct the secret
     let reconstructed_secret = reconstruct_secret(&shares[..threshold]);
-    println!("Reconstructed Secret: {}", reconstructed_secret);
+    println!("\nReconstructed Secret: {}", reconstructed_secret);
 
     // Validate that the reconstructed secret matches the original
     assert_eq!(secret, reconstructed_secret);
@@ -123,15 +116,20 @@ mod tests {
 
         // Generate a secret
         let secret = create_secret::<F>();
+        println!("\nGenerated Secret: {}", secret);
 
         // Generate shares and polynomial coefficients
         let threshold = 3;
         let num_shares = 5;
-        let shares = split_secret(threshold, num_shares);
-        dbg!(&shares);
+        let shares = split_secret(secret, threshold, num_shares);
+        
+        for (i, share) in shares.iter().enumerate() {
+            println!("\nShare {}: ({}, {})", i + 1, share.x, share.y);
+        }
 
         // Reconstruct the secret
         let reconstructed_secret = reconstruct_secret(&shares[..threshold]);
+        println!("\nReconstructed Secret: {}", reconstructed_secret);
 
         // Validate that the reconstructed secret matches the original
         assert_eq!(secret, reconstructed_secret);
