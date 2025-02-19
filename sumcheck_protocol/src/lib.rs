@@ -1,5 +1,5 @@
-use crate::fiat_shamir::FiatShamir;
-use crate::multilinear_poly::MultilinearPoly;
+use crate::fiat_shamir::Transcript;
+use crate::multilinear_polynomials::MultilinearPoly;
 use ark_ff::{BigInteger, PrimeField};
 use sha3::Keccak256;
 
@@ -30,7 +30,7 @@ fn absorb_bytes<F: PrimeField, I: IntoIterator<Item = F>>(elements: I) -> Vec<u8
 /// a claimed sum (the “public” sum) and returns a proof that consists of a sequence of round
 /// polynomials. (Each round polynomial has two evaluations.)
 pub fn prove<F: PrimeField>(poly: &MultilinearPoly<F>, claimed_sum: F) -> Proof<F> {
-    let mut transcript = FiatShamir::<Keccak256, F>::new();
+    let mut transcript = Transcript::<Keccak256, F>::new();
 
     // Absorb the public inputs: the polynomial’s evaluation table and the claimed sum.
     let poly_bytes = absorb_bytes(poly.evals.iter().copied());
@@ -74,7 +74,7 @@ pub fn prove<F: PrimeField>(poly: &MultilinearPoly<F>, claimed_sum: F) -> Proof<
 pub fn partial_prove<F: PrimeField>(
     poly: &MultilinearPoly<F>,
     claimed_sum: F,
-    transcript: &mut FiatShamir<Keccak256, F>,
+    transcript: &mut Transcript<Keccak256, F>,
 ) -> PartialProof<F> {
     // Absorb the public inputs.
     let poly_bytes = absorb_bytes(poly.evals.iter().copied());
@@ -124,7 +124,7 @@ pub fn verify<F: PrimeField>(proof: &Proof<F>, poly: &mut MultilinearPoly<F>) ->
         return false;
     }
 
-    let mut transcript = FiatShamir::<Keccak256, F>::new();
+    let mut transcript = Transcript::<Keccak256, F>::new();
     transcript.absorb(&absorb_bytes(poly.evals.iter().copied()));
     transcript.absorb(&proof.claimed_sum.into_bigint().to_bytes_be());
 
@@ -155,7 +155,7 @@ pub fn verify<F: PrimeField>(proof: &Proof<F>, poly: &mut MultilinearPoly<F>) ->
 pub fn partial_verify<F: PrimeField>(
     proof: &PartialProof<F>,
     poly: &mut MultilinearPoly<F>,
-    transcript: &mut FiatShamir<Keccak256, F>,
+    transcript: &mut Transcript<Keccak256, F>,
 ) -> (Vec<F>, F) {
     if proof.round_polys.len() != poly.n_vars {
         return (vec![], F::zero());
@@ -221,11 +221,11 @@ mod tests {
     fn test_partial_sumcheck_valid() {
         let poly = MultilinearPoly::new(to_field(vec![0, 0, 0, 3, 0, 0, 2, 5]), 3);
         let claimed_sum = Fr::from(10);
-        let mut transcript = FiatShamir::<Keccak256, Fr>::new();
+        let mut transcript = Transcript::<Keccak256, Fr>::new();
         let partial_proof = partial_prove(&poly, claimed_sum, &mut transcript);
 
         // For verification, we create a fresh transcript.
-        let mut verify_transcript = FiatShamir::<Keccak256, Fr>::new();
+        let mut verify_transcript = Transcript::<Keccak256, Fr>::new();
         let mut poly_for_verification = poly.clone();
         let (challenges, final_sum) = partial_verify(&partial_proof, &mut poly_for_verification, &mut verify_transcript);
 
@@ -238,14 +238,14 @@ mod tests {
     fn test_partial_sumcheck_invalid() {
         let poly = MultilinearPoly::new(to_field(vec![0, 0, 0, 3, 0, 0, 2, 5]), 3);
         let claimed_sum = Fr::from(10);
-        let mut transcript = FiatShamir::<Keccak256, Fr>::new();
+        let mut transcript = Transcript::<Keccak256, Fr>::new();
         let mut partial_proof = partial_prove(&poly, claimed_sum, &mut transcript);
 
         // Tamper with the second round polynomial.
         if let Some(round_poly) = partial_proof.round_polys.get_mut(1) {
             round_poly[1] = Fr::from(999);
         }
-        let mut verify_transcript = FiatShamir::<Keccak256, Fr>::new();
+        let mut verify_transcript = Transcript::<Keccak256, Fr>::new();
         let mut poly_for_verification = poly.clone();
         let (challenges, final_sum) =
             partial_verify(&partial_proof, &mut poly_for_verification, &mut verify_transcript);
