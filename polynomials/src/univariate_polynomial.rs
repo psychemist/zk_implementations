@@ -246,8 +246,8 @@ impl<F: PrimeField> Product for UnivariatePolySparse<F> {
 
 #[cfg(test)]
 mod test {
-    use crate::UnivariatePolyDense;
-    use crate::UnivariatePolySparse;
+    use crate::univariate_polynomial::UnivariatePolyDense;
+    use crate::univariate_polynomial::UnivariatePolySparse;
     use ark_bn254::Fq;
     use ark_bn254::Fr;
 

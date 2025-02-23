@@ -107,7 +107,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::MultilinearPoly;
+    use crate::multilinear_polynomial::MultilinearPoly;
     use ark_bn254::Fq;
 
     fn poly_1() -> MultilinearPoly<Fq> {

@@ -10,9 +10,9 @@ enum Operation {
 impl<F: PrimeField> From<F> for Operation {
     fn from(value: F) -> Self {
         match value {
-            0 => Operation::Add,
-            1 => Operation::Mul,
-            2 => Operation::Null,
+            0 => Operation::Null,
+            1 => Operation::Add,
+            2 => Operation::Mul,
         }
     }
 }
@@ -27,18 +27,18 @@ struct Gate<F: PrimeField> {
 
 #[derive(Debug, Clone)]
 struct Layer<F: PrimeField> {
-    gates: Vec<Gate>,
+    gates: Vec<Gate<F>>,
     // outputs: Vec<F>,
 }
 
 #[derive(Debug, Clone)]
 struct Circuit<F: PrimeField> {
-    layers: Vec<Vec<Gate>>,
+    layers: Vec<Vec<Gate<F>>>,
     // layers: Vec<Layer>,
     evaluations: Vec<Vec<F>>,
 }
 
-impl Circuit {
+impl<F: PrimeField> Circuit<F> {
     fn new() -> Self {
         // // let height = (inputs.len() as f64).sqrt();
         // // let mut layers = vec![vec![]; (2_u32.pow(height as F) - 1).try_into().unwrap()];
@@ -73,7 +73,7 @@ impl Circuit {
         }
     }
 
-    fn build_circuit<F: PrimeField>(layers: Vec<Vec<F>>) {
+    fn build_circuit(layers: Vec<Vec<F>>) {
         let mut circuit =  Circuit::new();
 
         for (i, layer) in layers.iter().enumerate() {
