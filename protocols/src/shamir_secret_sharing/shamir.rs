@@ -1,6 +1,6 @@
 use ark_ff::PrimeField;
 use rand::rngs::OsRng;
-use polynomials::univariate_polynomial::UnivariatePolyDense;
+use polynomials::univariate_polynomial::univariate::UnivariatePolyDense;
 // use univariate_polynomials::{self, UnivariatePolyDense};
  
 // const PRIME: F = 65537;
