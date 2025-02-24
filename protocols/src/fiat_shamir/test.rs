@@ -1,4 +1,3 @@
-
 #[cfg(test)]
 mod test {
     use crate::fiat_shamir::transcript::Transcript;
@@ -6,7 +5,6 @@ mod test {
     use ark_ff::{BigInteger, PrimeField};
     use sha3::digest::core_api::CoreWrapper;
     use sha3::{Digest, Keccak256, Keccak256Core};
-
 
     #[test]
     fn test_hash() {
@@ -55,10 +53,7 @@ mod test {
         second_transcript.squeeze();
         second_transcript.absorb(b"psychemist");
 
-        assert_eq!(
-            first_transcript.squeeze(),
-            second_transcript.squeeze()
-        );
+        assert_eq!(first_transcript.squeeze(), second_transcript.squeeze());
     }
 
     #[test]

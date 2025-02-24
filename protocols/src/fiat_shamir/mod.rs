@@ -1,2 +1,2 @@
-pub mod transcript;
 mod test;
+pub mod transcript;

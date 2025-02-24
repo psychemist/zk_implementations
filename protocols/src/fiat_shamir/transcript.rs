@@ -3,12 +3,12 @@ use sha3::{Digest, Keccak256};
 use std::marker::PhantomData;
 
 #[derive(Default)]
-pub struct Transcript <K: HashFunctionTrait, F: PrimeField> {
+pub struct Transcript<K: HashFunctionTrait, F: PrimeField> {
     hash_function: K,
     _field: PhantomData<F>,
 }
 
-impl <K: HashFunctionTrait, F: PrimeField> Transcript<K, F> {
+impl<K: HashFunctionTrait, F: PrimeField> Transcript<K, F> {
     pub fn new(hash_function: K) -> Self {
         Self {
             hash_function,
