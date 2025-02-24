@@ -1,5 +1,5 @@
 use ark_ff::PrimeField;
-use polynomials::univariate_polynomial::univariate::UnivariatePolyDense;
+use polynomials::univariate_polynomial::univariate_dense::UnivariatePolyDense;
 use rand::rngs::OsRng;
 // use univariate_polynomials::{self, UnivariatePolyDense};
 

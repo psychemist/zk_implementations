@@ -1,8 +1,8 @@
 
 #[cfg(test)]
 mod test {
-    use crate::univariate_polynomial::univariate::UnivariatePolyDense;
-    use crate::univariate_polynomial::univariate::UnivariatePolySparse;
+    use crate::univariate_polynomial::univariate_dense::UnivariatePolyDense;
+    use crate::univariate_polynomial::univariate_sparse::UnivariatePolySparse;
     use ark_bn254::Fq;
     use ark_bn254::Fr;
 
