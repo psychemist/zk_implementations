@@ -3,12 +3,11 @@ mod test {
     use crate::fiat_shamir::transcript::Transcript;
     use ark_bn254::Fq;
     use ark_ff::{BigInteger, PrimeField};
-    use sha3::digest::core_api::CoreWrapper;
-    use sha3::{Digest, Keccak256, Keccak256Core};
+    use sha3::{Digest, Keccak256};
 
     #[test]
     fn test_hash() {
-        let mut transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
         transcript.absorb(Fq::from(11).into_bigint().to_bytes_be().as_slice());
@@ -23,7 +22,7 @@ mod test {
 
     #[test]
     fn test_absorb_and_squeeze() {
-        let mut transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
         let element = 42;
@@ -37,10 +36,10 @@ mod test {
 
     #[test]
     fn test_transcript_determinism() {
-        let mut first_transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut first_transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
-        let mut second_transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut second_transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
         first_transcript.absorb(b"hello");
@@ -58,7 +57,7 @@ mod test {
 
     #[test]
     fn test_sample_challenge_should_absorb_after_sampling() {
-        let mut transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
         let element = 69;
@@ -85,7 +84,7 @@ mod test {
 
     #[test]
     fn test_transcript_should_iterate_over_sample_challenge() {
-        let mut transcript: Transcript<CoreWrapper<Keccak256Core>, Fq> =
+        let mut transcript: Transcript<Keccak256, Fq> =
             Transcript::new(Keccak256::new());
 
         let element = 127;
