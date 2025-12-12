@@ -35,7 +35,7 @@ impl<F: PrimeField + std::fmt::Display> MultilinearPoly<F> {
         // Use our helper to split the current evaluation vector based on the bit at `position`.
         let (vec0, vec1) = Self::get_paired_evals(&self.evaluations, position);
 
-        // For each pair, compute the combined value.
+        // For each pair, compute the combined value using Lagrange interpolation
         let new_evaluations: Vec<F> = vec0
             .into_iter()
             .zip(vec1.into_iter())
