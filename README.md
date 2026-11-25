@@ -11,7 +11,7 @@ The project is organized as a workspace with two primary crates:
 
 ## Implementations
 
-### 🧮 Polynomials (`/polynomials`)
+### Polynomials (`/polynomials`)
 Foundational structures required for the protocols:
 - **Multilinear Polynomials**: Implementation of polynomials in multiple variables where the degree in each variable is at most 1. Crucial for the Sumcheck protocol.
 - **Univariate Polynomials**: Basic operations for single-variable polynomials.
